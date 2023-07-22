@@ -8,14 +8,20 @@ public class Gmail extends Email
     int inboxCapacity; //maximum number of mails inbox can store
     //Inbox: Stores mails. Each mail has date (Date), sender (String), message (String). It is guaranteed that message is distinct for all mails.
     //Trash: Stores mails. Each mail has date (Date), sender (String), message (String)
-    TreeSet<Mail>inbox;
-    Set<Mail>trash;
+    Deque<Mail>inbox;
+
+    //addLast ---> mail Addition..
+    //latest mail last asnar
+
+    //removeFirst()...
+   ArrayList<Mail>trash;
     public Gmail(String emailId, int inboxCapacity)
     {
-        super(emailId);
+         super(emailId);
         this.inboxCapacity=inboxCapacity;
-        inbox=new TreeSet<>();
-        trash=new HashSet<>();
+          inbox=new LinkedList<>();
+          trash=new ArrayList<>();
+
     }
 
 
@@ -29,31 +35,31 @@ public class Gmail extends Email
         // 2. The mails are received in non-decreasing order. This means that the date of a new mail is greater than equal to the dates of mails received already.
         if(inbox.size()==inboxCapacity)
         {
-            //need to move the mail to trash..
-            Mail remove=inbox.first();
-            trash.add(remove);
-            inbox.remove(remove);
-            inbox.add(new Mail(date,sender,message));
+
+            Mail mail=inbox.removeFirst();
+            trash.add(mail);
+
+            ///add last hoto..
         }
-        else
-        {
-            inbox.add(new Mail(date,sender,message));
-        }
+        inbox.add(new Mail(date,sender,message));
+
     }
 
     public void deleteMail(String message)
     {
         // Each message is distinct
         // If the given message is found in any mail in the inbox, move the mail to trash, else do nothing
+
         for(Mail mail:inbox)
         {
-            if(mail.getMessage().equals(message))
+            if(mail.getMessage().equals(message)==true)
             {
               trash.add(mail);
               inbox.remove(mail);
               break;
             }
         }
+
 
     }
 
@@ -62,7 +68,7 @@ public class Gmail extends Email
         if(inbox.size()==0)return null;
         // If the inbox is empty, return null
         // Else, return the message of the latest mail present in the inbox
-        Mail mail=inbox.first();
+        Mail mail=inbox.getLast();
         return mail.getMessage();
 
     }
@@ -72,7 +78,7 @@ public class Gmail extends Email
         // Else, return the message of the oldest mail present in the inbox
 
         if(inbox.size()==0)return null;
-        Mail mail=inbox.last();
+        Mail mail=inbox.getFirst();
         return mail.getMessage();
 
     }
@@ -87,7 +93,7 @@ public class Gmail extends Email
            Date date=mail.getDate();
            int compareStart=date.compareTo(start);
            int compareEnd=date.compareTo(end);
-           if(compareEnd==0 || compareStart==0 || (compareStart<0 && compareEnd<0))count++;
+           if(compareEnd==0 || compareStart==0 || (compareStart>0 && compareEnd<0))count++;
 
         }
         return count;
@@ -110,7 +116,7 @@ public class Gmail extends Email
     public void emptyTrash()
     {
         // clear all mails in the trash
-        trash=new HashSet<>();
+        trash=new ArrayList<>();
 
     }
 
@@ -120,7 +126,7 @@ public class Gmail extends Email
     }
 }
 
-class Mail implements Comparable<Mail>
+class Mail
 {
     private Date date;
     private String sender;
@@ -162,11 +168,7 @@ class Mail implements Comparable<Mail>
         this.message = message;
     }
 
-    @Override
-    public int compareTo(Mail o)
-    {
-        return this.date.compareTo(o.date);
-    }
+
 
     @Override
     public String toString()
