@@ -3,6 +3,7 @@ package com.driver;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.time.LocalTime;
+import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -38,24 +39,37 @@ public class Workspace extends Gmail
         Collections.sort(calendar,(a,b)->
         {
             if(a.getStartTime().isAfter(b.getStartTime()))return 1;
-            else return -1;
+            else if(a.getStartTime().isBefore(b.getStartTime()))return -1;
+            else return 0;
         });
 
         //we have sorted order now you can calculate the number of meetings you can attained..
-        int m_Count=1;
-        LocalTime start=calendar.get(0).getStartTime();
-        LocalTime end=calendar.get(0).getEndTime();
-      for(int i=1;i<calendar.size();i++)
-      {
-         LocalTime curStart=calendar.get(i).getStartTime();
-         LocalTime curEnd=calendar.get(i).getEndTime();
-         if(curStart.isAfter(end))
-         {
-             m_Count++;
-             end=curEnd;
-         }
-      }
-      return m_Count;
+        int count=0;
+        LocalTime pStart=calendar.get(0).getStartTime();
+        LocalTime pEnd=calendar.get(0).getEndTime();
+        int n=calendar.size();
+        for(int i=1;i<n;i++)
+        {
+           LocalTime cStart=calendar.get(i).getStartTime();
+           LocalTime cEnd=calendar.get(i).getEndTime();
+           if(cStart.isAfter(pEnd))
+           {
+               count++;
+               pStart=cStart;
+               pEnd=cEnd;
+           }
+           else
+           {
+               //means overlapping..
+               if(pEnd.isAfter(cEnd))
+               {
+                   pStart=cStart;
+                   pEnd=cEnd;
+               }
+
+           }
+        }
+        return count+1;
 
     }
 }
