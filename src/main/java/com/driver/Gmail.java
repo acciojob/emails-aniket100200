@@ -91,9 +91,7 @@ public class Gmail extends Email
         for(Mail mail:inbox)
         {
             Date date=mail.getDate();
-           int compareStart=date.compareTo(start);
-           int compareEnd=date.compareTo(end);
-           if(compareEnd==0 || compareStart==0 || (compareStart>0 && compareEnd<0))count++;
+            if((date.before(start) && date.after(end)) || (!date.before(start) && !date.after(end)) )count++;
 
         }
         return count;
